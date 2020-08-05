@@ -14,10 +14,15 @@ def import_covid():
 
 def get_latest_available_date(country_df):
     mask_nci = country_df[['NCI']].notna().values
-    latest_avail_nci = country_df.loc[mask_nci, ['NCI']].iloc[-1].name
-
     mask_ppt = country_df[['PPT']].notna().values
-    latest_avail_ppt = country_df.loc[mask_ppt, ['PPT']].iloc[-1].name
+    try:
+        latest_avail_nci = country_df.loc[mask_nci, ['NCI']].iloc[-1].name
+    except:
+        latest_avail_nci = None
+    try:
+        latest_avail_ppt = country_df.loc[mask_ppt, ['PPT']].iloc[-1].name
+    except:
+        latest_avail_ppt = None
     return latest_avail_nci, latest_avail_ppt
 
 def assess_norwegian_metrics(covid, country_name):

@@ -8,8 +8,8 @@ def from_rgb(rgb):
     rgb = tuple(int(c*255) for c in rgb)
     return "#%02x%02x%02x" % rgb
 
-def plot_metrics(gui, data, date_ini, date_fin):
-    pop = data.loc[data.population.notna(),'population'].loc[date_fin]
+def plot_metrics(gui, data, date_ini=begin_day, date_fin=yday):
+    pop = data.loc[data.population.notna(),['population']].iloc[-1]
     dates = pd.date_range(date_ini, date_fin, periods=10)
     dates_mini = pd.date_range(date_ini, date_fin, periods=19)
     dateticks = [t.strftime('%b-%d') for t in dates]
@@ -19,7 +19,6 @@ def plot_metrics(gui, data, date_ini, date_fin):
 
     fig, axs = plt.subplots(figsize=(6,7.5), ncols=1, nrows=3, sharex=True)
     plots_tk = FigureCanvasTkAgg(fig, master=gui)
-    #plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=15)#, sticky="WENS")
 
     for ax in axs:
         ax.tick_params('both', which='both', labelsize=Z, top=True, right=True, direction='in')
@@ -76,5 +75,5 @@ def plot_metrics(gui, data, date_ini, date_fin):
     ax1.tick_params(labelsize=Z, labelcolor=(0.2,0.2,0.2))
     ax1.set_ylabel("Necessary PPT\nfor 'high incidence'", rotation=270, fontsize=Z-3, backgroundcolor=(0.9,0.9,0.9), labelpad=40)
     plt.tight_layout()
-    
+
     return plots_tk

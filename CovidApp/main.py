@@ -30,7 +30,6 @@ def show_metrics():
     plots_tk = plot_metrics(root, data, date_ini=date_min, date_fin=date_max)
     plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=15)
 
-
 def update_slider_min(value):
     xmin = datetime.strftime(dates_dict[int(value)], "%b %d, %Y")
     xmin_slider.config(label=xmin)
@@ -91,8 +90,8 @@ xmax_label.grid(column=1, row=11, sticky=W, padx=40)
 xmax_slider.grid(column=1, row=12)
 apply_button.grid(column=1, row=13)
 
-fig, axs = plt.subplots(figsize=(6,7.5), ncols=1, nrows=3, sharex=True)
-plots_tk = FigureCanvasTkAgg(fig, master=root)
+bland_df = pd.DataFrame(0, columns=cols+['NCI','PPT'], dtype='int',index=[datetime.strptime('2020-01-01', '%Y-%m-%d')])
+plots_tk = plot_metrics(root, bland_df)
 plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=15)
 
 root.mainloop()
