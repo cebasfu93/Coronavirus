@@ -13,7 +13,7 @@ def plot_metrics(gui, data, date_ini=begin_day, date_fin=yday):
     dates = pd.date_range(date_ini, date_fin, periods=10)
     dates_mini = pd.date_range(date_ini, date_fin, periods=19)
     dateticks = [t.strftime('%b-%d') for t in dates]
-    data_keep = data.loc[np.logical_and(data.index>date_ini.strftime("%Y-%m-%d"), data.index<date_fin.strftime("%Y-%m-%d"))]
+    data_keep = data.loc[np.logical_and(data.index>=date_ini.strftime("%Y-%m-%d"), data.index<=date_fin.strftime("%Y-%m-%d"))]
 
     new_cases_warn = int(NCI_max*pop/(100000*DT_int))
 

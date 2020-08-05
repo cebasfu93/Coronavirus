@@ -25,12 +25,12 @@ def show_metrics():
         nci = data.loc[latest_date_nci, 'NCI']
         nci_txt.set(latest_nci_txt.format(nci, latest_date_nci.strftime("%b %d, %Y")))
     else:
-        nci_txt.set("No information available to calculate NCI in this country")
+        nci_txt.set("Not enough information available to calculate NCI in this country")
     if latest_date_ppt != None:
         ppt = data.loc[latest_date_ppt, 'PPT']
         ppt_txt.set(latest_ppt_txt.format(ppt, latest_date_ppt.strftime("%b %d, %Y")))
     else:
-        ppt_txt.set("No information available to calculate PPT in this country")
+        ppt_txt.set("Not enough information available to calculate PPT in this country")
     data_label.grid(column=1, row=7)
     nci_label.grid(column=1, row=8)
     ppt_label.grid(column=1, row=9)
