@@ -1,3 +1,4 @@
+from tkinter import filedialog
 from tkinter import *
 from datetime import date
 from datetime import datetime
@@ -48,6 +49,12 @@ def update_slider_max(value):
     xmax = datetime.strftime(dates_dict[int(value)], "%b %d, %Y")
     xmax_slider.config(label=xmax)
 
+def save_data():
+    data, latest_date_nci, latest_date_ppt = assess_norwegian_metrics(covid, country_entry.get())
+    data = data.loc[:,['new_cases_per_million', 'new_tests', 'population', 'new_cases', 'NCI', 'PPT']]
+    root.filename = filedialog.asksaveasfilename(initialdir="~", title="Save file as", filetypes=(("csv files","*.csv"),("all files","*.*")))
+    data.to_csv(root.filename)
+
 root = Tk()
 root.iconbitmap('images/SFU.ico')
 root.configure(bg='white')
@@ -69,7 +76,7 @@ country_entry.set(country_default)
 country_drop = OptionMenu(root, country_entry, *countries)
 country_drop.config(bg=from_rgb((0.7,1,1)), font='Arial 12', activebackground=from_rgb((0.5,0.8,0.9)), width=11, borderwidth=2)
 
-apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
+go_button = Button(root, bg=from_rgb((1,0.7,1)), text='Go!', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
 
 data_txt, nci_txt, ppt_txt = StringVar(), StringVar(), StringVar()
 data_txt.set('\nSelect a contry to display information')
@@ -86,7 +93,8 @@ xmax_label = Label(root, text=date_max_txt, bg=bg, font='Arial 12', justify=LEFT
 xmax_slider = Scale(root, from_=min(dates_dict), to=max(dates_dict), resolution=1, orient=HORIZONTAL, showvalue=False, command=update_slider_max, length=500, label=datetime.strftime(date_max, "%b %d, %Y"), font='Arial 11', bg=bg, relief='groove', troughcolor=from_rgb((0.9,0.9,0.8)))
 xmax_slider.set(max(dates_dict))
 
-go_button = Button(root, bg=from_rgb((1,0.7,1)), text='Go!', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
+apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
+export_button = Button(root, bg=from_rgb((0.6,0.9,0.6)), text='Save data (.csv)', command=save_data, font='Arial 12', activebackground=from_rgb((0.3,0.6,0.3)), width=15, relief='solid', borderwidth=1.5)
 
 info_label1.grid(column=1, row=1)
 info_label2.grid(column=1, row=2)
@@ -101,7 +109,8 @@ xmin_label.grid(column=1, row=10, sticky=W, padx=40)
 xmin_slider.grid(column=1, row=11)
 xmax_label.grid(column=1, row=12, sticky=W, padx=40)
 xmax_slider.grid(column=1, row=13)
-apply_button.grid(column=1, row=14)
+apply_button.grid(column=1, row=14, sticky=W, padx=40)
+export_button.grid(column=1, row=14, sticky=E, padx=40)
 
 bland_df = pd.DataFrame(0, columns=cols+['NCI','PPT'], dtype='int',index=[datetime.strptime('2020-01-01', '%Y-%m-%d')])
 plots_tk = plot_metrics(root, bland_df)
