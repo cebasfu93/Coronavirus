@@ -17,13 +17,23 @@ def show_metrics():
     date_max = dates_dict[xmax_slider.get()]
 
     data, latest_date_nci, latest_date_ppt = assess_norwegian_metrics(covid, country_entry.get())
-    nci, ppt = data.loc[latest_date_nci, 'NCI'], data.loc[latest_date_ppt, 'PPT']
     data_label.grid_forget()
-    metric_label.grid_forget()
+    nci_label.grid_forget()
+    ppt_label.grid_forget()
     data_txt.set(latest_data_txt)
-    metric_txt.set(metrics_txt.format(nci, latest_date_nci.strftime("%b %d, %Y"), ppt, latest_date_ppt.strftime("%b %d, %Y")))
+    if latest_date_nci != None:
+        nci = data.loc[latest_date_nci, 'NCI']
+        nci_txt.set(latest_nci_txt.format(nci, latest_date_nci.strftime("%b %d, %Y")))
+    else:
+        nci_txt.set("No information available to calculate NCI in this country")
+    if latest_date_ppt != None:
+        ppt = data.loc[latest_date_ppt, 'PPT']
+        ppt_txt.set(latest_ppt_txt.format(ppt, latest_date_ppt.strftime("%b %d, %Y")))
+    else:
+        ppt_txt.set("No information available to calculate PPT in this country")
     data_label.grid(column=1, row=7)
-    metric_label.grid(column=1, row=8)
+    nci_label.grid(column=1, row=8)
+    ppt_label.grid(column=1, row=9)
 
     global plots_tk
     plots_tk.get_tk_widget().grid_forget()
@@ -61,11 +71,13 @@ country_drop.config(bg=from_rgb((0.7,1,1)), font='Arial 12', activebackground=fr
 
 apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
 
-data_txt, metric_txt = StringVar(), StringVar()
-data_txt.set('')
-metric_txt.set('Select a contry to display information\n')
+data_txt, nci_txt, ppt_txt = StringVar(), StringVar(), StringVar()
+data_txt.set('\nSelect a contry to display information')
+nci_txt.set('')
+ppt_txt.set('\n')
 data_label = Label(root, bg=bg, textvariable=data_txt, font='Arial 12')
-metric_label = Label(root, bg=bg, textvariable=metric_txt, font='Arial 12 bold')
+nci_label = Label(root, bg=bg, textvariable=nci_txt, font='Arial 12 bold')
+ppt_label = Label(root, bg=bg, textvariable=ppt_txt, font='Arial 12 bold')
 
 xmin_label = Label(root, text=date_min_txt, bg=bg, font='Arial 12', justify=LEFT)
 xmin_slider = Scale(root, from_=min(dates_dict), to=max(dates_dict), resolution=1, orient=HORIZONTAL, showvalue=False, command=update_slider_min, length=500, label=datetime.strftime(date_min, "%b %d, %Y"), font='Arial 11', bg=bg, relief='groove', troughcolor=from_rgb((0.9,0.9,0.8)))
@@ -83,12 +95,13 @@ country_label.grid(column=1, row=4)
 country_drop.grid(column=1, row=5)
 go_button.grid(column=1, row=6)
 data_label.grid(column=1, row=7)
-metric_label.grid(column=1, row=8)
-xmin_label.grid(column=1, row=9, sticky=W, padx=40)
-xmin_slider.grid(column=1, row=10)
-xmax_label.grid(column=1, row=11, sticky=W, padx=40)
-xmax_slider.grid(column=1, row=12)
-apply_button.grid(column=1, row=13)
+nci_label.grid(column=1, row=8)
+ppt_label.grid(column=1, row=9)
+xmin_label.grid(column=1, row=10, sticky=W, padx=40)
+xmin_slider.grid(column=1, row=11)
+xmax_label.grid(column=1, row=12, sticky=W, padx=40)
+xmax_slider.grid(column=1, row=13)
+apply_button.grid(column=1, row=14)
 
 bland_df = pd.DataFrame(0, columns=cols+['NCI','PPT'], dtype='int',index=[datetime.strptime('2020-01-01', '%Y-%m-%d')])
 plots_tk = plot_metrics(root, bland_df)

@@ -14,8 +14,8 @@ question_txt = 'Which country would you like to assess?'
 country_default = "Select"
 
 latest_data_txt = "\nLatest data available:"
-
-metrics_txt = "NCI: {:.2f}   ({})\nPPT: {:.2f}   ({})\n"
+latest_nci_txt = "NCI: {:.2f}   ({})"
+latest_ppt_txt = "PPT: {:.2f}   ({})\n"
 
 date_min_txt = 'Minimum date to plot'
 date_max_txt = 'Maximum date to plot'
