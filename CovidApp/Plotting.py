@@ -8,6 +8,11 @@ def from_rgb(rgb):
     rgb = tuple(int(c*255) for c in rgb)
     return "#%02x%02x%02x" % rgb
 
+def hex_to_rgb(hex):
+    hex = hex.lstrip('#')
+    lv = len(hex)
+    return tuple(int(hex[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
 def plot_metrics(gui, data, date_ini=begin_day, date_fin=yday):
     pop = data.loc[data.population.notna(),['population']].iloc[-1]
     dates = pd.date_range(date_ini, date_fin, periods=10)

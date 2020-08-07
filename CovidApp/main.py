@@ -7,11 +7,34 @@ import os
 from Text import *
 from Constants import *
 from Processing import import_covid, get_latest_available_date, assess_norwegian_metrics
-from Plotting import from_rgb, plot_metrics
+from Plotting import from_rgb, hex_to_rgb, plot_metrics
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from collections import defaultdict
 import webbrowser
+
+def popup_country_select_warning():
+    popup = Toplevel()
+    popup.iconbitmap('images/SFU.ico')
+    popup.configure(bg='white')
+    popup.title('Invalid request')
+    popup.geometry('400x300')
+    frame = Frame(popup, bg=bg, relief='groove', padx=75, pady=75, borderwidth=2)
+    popup_label = Label(frame, bg=bg, text=country_warn, font='Arial 16')
+    popup_button = Button(frame, bg=from_rgb((0.8,0.8,0.8)), activebackground=from_rgb((0.5,0.5,0.5)), text=popup_close, command=popup.destroy, font='Arial 14', width=15, relief='solid', borderwidth=1.5)
+    frame.pack(expand=True)
+    popup_label.pack()
+    popup_button.pack(pady=30)
+
+def hover_in_color_change(event):
+    rgb = hex_to_rgb(event.widget["bg"])
+    rgb = (c/1.3 for c in rgb)
+    event.widget["bg"] = from_rgb(rgb)
+
+def hover_out_color_change(event):
+    rgb = hex_to_rgb(event.widget["bg"])
+    rgb = tuple(c*1.3/(255*255) for c in rgb)
+    event.widget["bg"] = from_rgb(rgb)
 
 def open_website(event):
     webbrowser.open_new(event.widget.cget("text"))
@@ -48,17 +71,7 @@ def show_metrics():
         plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=16)
 
     else:
-        popup = Toplevel()
-        popup.iconbitmap('images/SFU.ico')
-        popup.configure(bg='white')
-        popup.title('Invalid request')
-        popup.geometry('400x300')
-        frame = Frame(popup, bg=bg, relief='groove', padx=75, pady=75, borderwidth=2)
-        popup_label = Label(frame, bg=bg, text=country_warn, font='Arial 16')
-        popup_button = Button(frame, bg=from_rgb((0.8,0.8,0.8)), activebackground=from_rgb((0.5,0.5,0.5)), text=popup_close, command=popup.destroy, font='Arial 14', width=15, relief='solid', borderwidth=1.5)
-        frame.pack(expand=True)
-        popup_label.pack()
-        popup_button.pack(pady=30)
+        popup_country_select_warning()
 
 def update_slider_min(value):
     xmin = datetime.strftime(dates_dict[int(value)], "%b %d, %Y")
@@ -69,10 +82,13 @@ def update_slider_max(value):
     xmax_slider.config(label=xmax)
 
 def save_data():
-    data, latest_date_nci, latest_date_ppt = assess_norwegian_metrics(covid, country_entry.get())
-    data = data.loc[:,['new_cases_per_million', 'new_tests', 'population', 'new_cases', 'NCI', 'PPT']]
-    root.filename = filedialog.asksaveasfilename(initialdir="~", title="Save file as", filetypes=(("csv files","*.csv"),("all files","*.*")))
-    data.to_csv(root.filename)
+    if country_entry.get() != country_default:
+        data, latest_date_nci, latest_date_ppt = assess_norwegian_metrics(covid, country_entry.get())
+        data = data.loc[:,['new_cases_per_million', 'new_tests', 'population', 'new_cases', 'NCI', 'PPT']]
+        root.filename = filedialog.asksaveasfilename(initialdir="~", title="Save file as", filetypes=(("csv files","*.csv"),("all files","*.*")))
+        data.to_csv(root.filename)
+    else:
+        popup_country_select_warning()
 
 root = Tk()
 root.iconbitmap('images/SFU.ico')
@@ -95,7 +111,9 @@ country_entry.set(country_default)
 country_drop = OptionMenu(root, country_entry, *countries)
 country_drop.config(bg=from_rgb((0.7,1,1)), font='Arial 12', activebackground=from_rgb((0.5,0.8,0.9)), width=11, borderwidth=2)
 
-go_button = Button(root, bg=from_rgb((1,0.7,1)), text='Go!', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
+go_button = Button(root, bg=from_rgb((1,0.7,1)), text='Go!', command=show_metrics, font='Arial 12', activebackground=from_rgb((1,0.7,1)), width=15, relief='solid', borderwidth=1.5)
+go_button.bind("<Enter>", hover_in_color_change)
+go_button.bind("<Leave>", hover_out_color_change)
 
 data_txt, nci_txt, ppt_txt = StringVar(), StringVar(), StringVar()
 data_txt.set('\nSelect a contry to display information')
@@ -120,8 +138,12 @@ data_origin_label = Label(root, text=data_origin_txt, bg=bg, font='Arial 10', ju
 data_web_label = Label(root, text=data_website_txt, bg=bg, font='Arial 10 bold', justify=RIGHT, fg=from_rgb((0.2,0.2,1.0)), cursor="hand2")
 data_web_label.bind("<Button-1>", open_website)
 
-apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
-export_button = Button(root, bg=from_rgb((0.6,0.9,0.6)), text='Save data (.csv)', command=save_data, font='Arial 12', activebackground=from_rgb((0.3,0.6,0.3)), width=15, relief='solid', borderwidth=1.5)
+apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((1,0.7,1)), width=15, relief='solid', borderwidth=1.5)
+apply_button.bind("<Enter>", hover_in_color_change)
+apply_button.bind("<Leave>", hover_out_color_change)
+export_button = Button(root, bg=from_rgb((0.6,0.9,0.6)), text='Save data (.csv)', command=save_data, font='Arial 12', activebackground=from_rgb((0.6,0.9,0.6)), width=15, relief='solid', borderwidth=1.5)
+export_button.bind("<Enter>", hover_in_color_change)
+export_button.bind("<Leave>", hover_out_color_change)
 
 info_label1.grid(column=1, row=1)
 info_label2.grid(column=1, row=2)
@@ -138,10 +160,10 @@ xmax_label.grid(column=1, row=12, sticky=W, padx=40)
 xmax_slider.grid(column=1, row=13)
 apply_button.grid(column=1, row=14, sticky=W, padx=40)
 export_button.grid(column=1, row=14, sticky=E, padx=40)
-dev_label.grid(column=1, row=15, sticky=W, padx=40)
-web_label.grid(column=1, row=16, sticky=W, padx=40)
-data_origin_label.grid(column=1, row=15, sticky=E, padx=40)
-data_web_label.grid(column=1, row=16, sticky=E, padx=40)
+dev_label.grid(column=1, row=15, sticky="WS", padx=40)
+web_label.grid(column=1, row=16, sticky="WN", padx=40)
+data_origin_label.grid(column=1, row=15, sticky="ES", padx=40)
+data_web_label.grid(column=1, row=16, sticky="EN", padx=40)
 
 bland_df = pd.DataFrame(0, columns=cols+['NCI','PPT'], dtype='int',index=[datetime.strptime('2020-01-01', '%Y-%m-%d')])
 plots_tk = plot_metrics(root, bland_df)
