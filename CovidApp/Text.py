@@ -19,3 +19,7 @@ latest_ppt_txt = "PPT: {:.2f}   ({})\n"
 
 date_min_txt = 'Minimum date to plot'
 date_max_txt = 'Maximum date to plot'
+
+country_warn = "Please select a country"
+popup_close = "Ok"
+developer_txt = "Developed by Sebastian Franco Ulloa (www.sebastianfu.com)"

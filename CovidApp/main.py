@@ -10,36 +10,51 @@ from Processing import import_covid, get_latest_available_date, assess_norwegian
 from Plotting import from_rgb, plot_metrics
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from collections import defaultdict
 
 def show_metrics():
-    global date_min
-    global date_max
-    date_min = dates_dict[xmin_slider.get()]
-    date_max = dates_dict[xmax_slider.get()]
+    if country_entry.get() != country_default:
+        global date_min
+        global date_max
+        date_min = dates_dict[xmin_slider.get()]
+        date_max = dates_dict[xmax_slider.get()]
 
-    data, latest_date_nci, latest_date_ppt = assess_norwegian_metrics(covid, country_entry.get())
-    data_label.grid_forget()
-    nci_label.grid_forget()
-    ppt_label.grid_forget()
-    data_txt.set(latest_data_txt)
-    if latest_date_nci != None:
-        nci = data.loc[latest_date_nci, 'NCI']
-        nci_txt.set(latest_nci_txt.format(nci, latest_date_nci.strftime("%b %d, %Y")))
-    else:
-        nci_txt.set("Not enough information available to calculate NCI in this country")
-    if latest_date_ppt != None:
-        ppt = data.loc[latest_date_ppt, 'PPT']
-        ppt_txt.set(latest_ppt_txt.format(ppt, latest_date_ppt.strftime("%b %d, %Y")))
-    else:
-        ppt_txt.set("Not enough information available to calculate PPT in this country")
-    data_label.grid(column=1, row=7)
-    nci_label.grid(column=1, row=8)
-    ppt_label.grid(column=1, row=9)
+        data, latest_date_nci, latest_date_ppt = assess_norwegian_metrics(covid, country_entry.get())
+        data_label.grid_forget()
+        nci_label.grid_forget()
+        ppt_label.grid_forget()
+        data_txt.set(latest_data_txt)
+        if latest_date_nci != None:
+            nci = data.loc[latest_date_nci, 'NCI']
+            nci_txt.set(latest_nci_txt.format(nci, latest_date_nci.strftime("%b %d, %Y")))
+        else:
+            nci_txt.set("Not enough information available to calculate NCI in this country")
+        if latest_date_ppt != None:
+            ppt = data.loc[latest_date_ppt, 'PPT']
+            ppt_txt.set(latest_ppt_txt.format(ppt, latest_date_ppt.strftime("%b %d, %Y")))
+        else:
+            ppt_txt.set("Not enough information available to calculate PPT in this country")
+        data_label.grid(column=1, row=7)
+        nci_label.grid(column=1, row=8)
+        ppt_label.grid(column=1, row=9)
 
-    global plots_tk
-    plots_tk.get_tk_widget().grid_forget()
-    plots_tk = plot_metrics(root, data, date_ini=date_min, date_fin=date_max)
-    plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=15)
+        global plots_tk
+        plots_tk.get_tk_widget().grid_forget()
+        plots_tk = plot_metrics(root, data, date_ini=date_min, date_fin=date_max)
+        plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=15)
+
+    else:
+        popup = Toplevel()
+        popup.iconbitmap('images/SFU.ico')
+        popup.configure(bg='white')
+        popup.title('Invalid request')
+        popup.geometry('400x300')
+        frame = Frame(popup, bg=bg, relief='groove', padx=75, pady=75, borderwidth=2)
+        popup_label = Label(frame, bg=bg, text=country_warn, font='Arial 16')
+        popup_button = Button(frame, bg=from_rgb((0.8,0.8,0.8)), activebackground=from_rgb((0.5,0.5,0.5)), text=popup_close, command=popup.destroy, font='Arial 14', width=15, relief='solid', borderwidth=1.5)
+        frame.pack(expand=True)
+        popup_label.pack()
+        popup_button.pack(pady=30)
 
 def update_slider_min(value):
     xmin = datetime.strftime(dates_dict[int(value)], "%b %d, %Y")
@@ -93,6 +108,8 @@ xmax_label = Label(root, text=date_max_txt, bg=bg, font='Arial 12', justify=LEFT
 xmax_slider = Scale(root, from_=min(dates_dict), to=max(dates_dict), resolution=1, orient=HORIZONTAL, showvalue=False, command=update_slider_max, length=500, label=datetime.strftime(date_max, "%b %d, %Y"), font='Arial 11', bg=bg, relief='groove', troughcolor=from_rgb((0.9,0.9,0.8)))
 xmax_slider.set(max(dates_dict))
 
+dev_label = Label(root, text, developer_txt, bg=bg, font='Arial 8', justify=LEFT)
+
 apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
 export_button = Button(root, bg=from_rgb((0.6,0.9,0.6)), text='Save data (.csv)', command=save_data, font='Arial 12', activebackground=from_rgb((0.3,0.6,0.3)), width=15, relief='solid', borderwidth=1.5)
 
@@ -111,6 +128,7 @@ xmax_label.grid(column=1, row=12, sticky=W, padx=40)
 xmax_slider.grid(column=1, row=13)
 apply_button.grid(column=1, row=14, sticky=W, padx=40)
 export_button.grid(column=1, row=14, sticky=E, padx=40)
+dev_label.grid(column=1, row=15, sticky=W, pady=20)
 
 bland_df = pd.DataFrame(0, columns=cols+['NCI','PPT'], dtype='int',index=[datetime.strptime('2020-01-01', '%Y-%m-%d')])
 plots_tk = plot_metrics(root, bland_df)
