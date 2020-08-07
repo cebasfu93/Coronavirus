@@ -7,7 +7,7 @@ In order for the Norwegian state to consider a country as\na high-incidence (i.e
 
 info_txt2 = "NCI  > {:d}\nPPT >  {:d}\n".format(NCI_max, PPT_max)
 
-info_txt3 = "-------------------------------------------------------------------------------------------------------------------\n"
+info_txt3 = " ------------------------------------------------------------------------------------------------------------------\n"
 
 question_txt = 'Which country would you like to assess?'
 
@@ -22,4 +22,6 @@ date_max_txt = 'Maximum date to plot'
 
 country_warn = "Please select a country"
 popup_close = "Ok"
-developer_txt = "Developed by Sebastian Franco Ulloa (www.sebastianfu.com)"
+
+developer_txt = "Developed by Sebastian Franco Ulloa"
+website_txt = "www.sebastianfu.com"

@@ -11,6 +11,10 @@ from Plotting import from_rgb, plot_metrics
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from collections import defaultdict
+import webbrowser
+
+def open_website(event):
+    webbrowser.open_new(website_txt)
 
 def show_metrics():
     if country_entry.get() != country_default:
@@ -108,7 +112,9 @@ xmax_label = Label(root, text=date_max_txt, bg=bg, font='Arial 12', justify=LEFT
 xmax_slider = Scale(root, from_=min(dates_dict), to=max(dates_dict), resolution=1, orient=HORIZONTAL, showvalue=False, command=update_slider_max, length=500, label=datetime.strftime(date_max, "%b %d, %Y"), font='Arial 11', bg=bg, relief='groove', troughcolor=from_rgb((0.9,0.9,0.8)))
 xmax_slider.set(max(dates_dict))
 
-dev_label = Label(root, text, developer_txt, bg=bg, font='Arial 8', justify=LEFT)
+dev_label = Label(root, text=developer_txt, bg=bg, font='Arial 10', justify=LEFT)
+web_label = Label(root, text=website_txt, bg=bg, font='Arial 10 bold', justify=LEFT, fg=from_rgb((0.2,0.2,1.0)))
+web_label.bind("<Button-1>", open_website)
 
 apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
 export_button = Button(root, bg=from_rgb((0.6,0.9,0.6)), text='Save data (.csv)', command=save_data, font='Arial 12', activebackground=from_rgb((0.3,0.6,0.3)), width=15, relief='solid', borderwidth=1.5)
@@ -128,7 +134,8 @@ xmax_label.grid(column=1, row=12, sticky=W, padx=40)
 xmax_slider.grid(column=1, row=13)
 apply_button.grid(column=1, row=14, sticky=W, padx=40)
 export_button.grid(column=1, row=14, sticky=E, padx=40)
-dev_label.grid(column=1, row=15, sticky=W, pady=20)
+dev_label.grid(column=1, row=15, sticky=W, padx=40)
+web_label.grid(column=1, row=16, sticky=W, padx=40)
 
 bland_df = pd.DataFrame(0, columns=cols+['NCI','PPT'], dtype='int',index=[datetime.strptime('2020-01-01', '%Y-%m-%d')])
 plots_tk = plot_metrics(root, bland_df)
