@@ -14,7 +14,7 @@ from collections import defaultdict
 import webbrowser
 
 def open_website(event):
-    webbrowser.open_new(website_txt)
+    webbrowser.open_new(event.widget.cget("text"))
 
 def show_metrics():
     if country_entry.get() != country_default:
@@ -45,7 +45,7 @@ def show_metrics():
         global plots_tk
         plots_tk.get_tk_widget().grid_forget()
         plots_tk = plot_metrics(root, data, date_ini=date_min, date_fin=date_max)
-        plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=15)
+        plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=16)
 
     else:
         popup = Toplevel()
@@ -113,8 +113,12 @@ xmax_slider = Scale(root, from_=min(dates_dict), to=max(dates_dict), resolution=
 xmax_slider.set(max(dates_dict))
 
 dev_label = Label(root, text=developer_txt, bg=bg, font='Arial 10', justify=LEFT)
-web_label = Label(root, text=website_txt, bg=bg, font='Arial 10 bold', justify=LEFT, fg=from_rgb((0.2,0.2,1.0)))
+web_label = Label(root, text=website_txt, bg=bg, font='Arial 10 bold', justify=LEFT, fg=from_rgb((0.2,0.2,1.0)), cursor="hand2")
 web_label.bind("<Button-1>", open_website)
+
+data_origin_label = Label(root, text=data_origin_txt, bg=bg, font='Arial 10', justify=RIGHT)
+data_web_label = Label(root, text=data_website_txt, bg=bg, font='Arial 10 bold', justify=RIGHT, fg=from_rgb((0.2,0.2,1.0)), cursor="hand2")
+data_web_label.bind("<Button-1>", open_website)
 
 apply_button = Button(root, bg=from_rgb((1,0.7,1)), text='Apply changes', command=show_metrics, font='Arial 12', activebackground=from_rgb((0.8,0.5,0.8)), width=15, relief='solid', borderwidth=1.5)
 export_button = Button(root, bg=from_rgb((0.6,0.9,0.6)), text='Save data (.csv)', command=save_data, font='Arial 12', activebackground=from_rgb((0.3,0.6,0.3)), width=15, relief='solid', borderwidth=1.5)
@@ -136,9 +140,11 @@ apply_button.grid(column=1, row=14, sticky=W, padx=40)
 export_button.grid(column=1, row=14, sticky=E, padx=40)
 dev_label.grid(column=1, row=15, sticky=W, padx=40)
 web_label.grid(column=1, row=16, sticky=W, padx=40)
+data_origin_label.grid(column=1, row=15, sticky=E, padx=40)
+data_web_label.grid(column=1, row=16, sticky=E, padx=40)
 
 bland_df = pd.DataFrame(0, columns=cols+['NCI','PPT'], dtype='int',index=[datetime.strptime('2020-01-01', '%Y-%m-%d')])
 plots_tk = plot_metrics(root, bland_df)
-plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=15)
+plots_tk.get_tk_widget().grid(column=2, row=1, rowspan=16)
 
 root.mainloop()

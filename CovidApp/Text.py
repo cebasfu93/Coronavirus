@@ -25,3 +25,6 @@ popup_close = "Ok"
 
 developer_txt = "Developed by Sebastian Franco Ulloa"
 website_txt = "www.sebastianfu.com"
+
+data_origin_txt = "Data from Our World in Data"
+data_website_txt = "www.ourworldindata.org"
